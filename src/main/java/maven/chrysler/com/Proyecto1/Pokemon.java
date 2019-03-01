@@ -6,11 +6,12 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import javax.persistence.Table;
 
 @Entity
@@ -26,8 +27,10 @@ public class Pokemon  {
 	private int vida;
 	@Column(name="daño")
 	private int daño;
-	 @OneToMany(mappedBy = "pokemon", fetch=FetchType.EAGER)
-	    private List<Tipo> tipo = new ArrayList<>();
+	 @ManyToOne
+	 @JoinColumn(name ="id_tipo")
+	  private Tipo tipo ;
+	 
 	public  Pokemon (){
 	
 	}	
@@ -60,15 +63,9 @@ public class Pokemon  {
 		return nombre;
 	}
 	
-
 	    public void setTipo(Tipo tipo){
-	        this.tipo.add(tipo);
+	        this.tipo = tipo;
 	    }
-
-	    public void setLTipos(List<Tipo> tipos){
-	        this.tipo=tipos;
-	    }
-
-	    public List<Tipo> getTipos(){return  tipo;}
+	    public Tipo getTipos(){return  tipo;}
 	
 }

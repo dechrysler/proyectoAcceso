@@ -1,12 +1,16 @@
 package maven.chrysler.com.Proyecto1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -22,9 +26,8 @@ public class Tipo {
 	private String debilidad;
 	@Column(name="ataque_especial")
 	private String ataque_especial;
-	@ManyToOne
-    @JoinColumn(name = "id_pokemon")
-    private Pokemon pokemon;
+	@OneToMany(mappedBy ="tipo", fetch=FetchType.EAGER)
+    List<Pokemon> pokemones= new ArrayList<>();
 	
 	public Tipo() {
 	}
@@ -57,9 +60,9 @@ public class Tipo {
 	public String toString() {
 		return nombre;
 	}
-	public void setPokemon(Pokemon pokemon){
-		this.pokemon=pokemon;
+	public void setPokemon(List<Pokemon> pokemon){
+		this.pokemones = pokemon;
 	}
-	public Pokemon getPersonaje(){return pokemon;}
+	public List<Pokemon> getPokemones(){return pokemones;}
 
 }

@@ -32,6 +32,7 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 	private Pokemon pokemonSeleccionado;
 	private boolean editar=false;
 	private PanelAnadirTipos tiposPanel;
+	private JButton btnNewButton;
 	public PanelPokemon(Modelo modelo) {
 		setLayout(null);
 		this.modelo = modelo;
@@ -107,11 +108,9 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		botones.setBounds(47, 198, 190, 67);
 		add(botones);
 		
-		JButton btnNewButton = new JButton("ELIMINAR TODO");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
+		 btnNewButton = new JButton("ELIMINAR TODO");
+		 btnNewButton.setActionCommand("ELIMINAR_TODO");
+		 btnNewButton.addActionListener(this);
 		btnNewButton.setBounds(100, 266, 164, 23);
 		add(btnNewButton);
 		 inicializar();
@@ -150,6 +149,10 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 			case "CANCELAR":
 				limpiar();
 				break;
+			case "ELIMINAR_TODO":
+				modelo.borrarTodo();
+				actualizarPersonajes();
+				break;
 			default:
 				System.out.println("error");
 		}
@@ -168,10 +171,20 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 			pokemon.setNombre(nombre);
 			pokemon.setVida(vida);
 			pokemon.setDaño(danio);
-	        if(editar)
+	        if(editar) {
 	            pokemon.setId(pokemonSeleccionado.getId());
-	       pokemon.setTipo(tiposPanel.getListaTipos().get(0));
+	            if(pokemon.getTipos()!=null)
+	            	if(tiposPanel.mlista.size()==0)
+	            		pokemon.setTipo(null);
+	            	else
+	            		if(pokemon.getTipos().getId()==tiposPanel.getListaTipos().get(0).getId())
+	            			pokemon.setTipo(tiposPanel.getListaTipos().get(0));
+	        }
+	       if(tiposPanel.mlista.size()==1)
+	    	   pokemon.setTipo(tiposPanel.getListaTipos().get(0));
 	        return pokemon;
+	       
+	        
 	    }
 
 	public void actualizarPersonajes() {
@@ -184,6 +197,7 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		tfNombre.setText("");
 		tfVida.setText("");
 		tfDanio.setText("");
+		tiposPanel.refrescar();
 	}
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
@@ -192,6 +206,9 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		pokemonSeleccionado =(Pokemon) listaPokemon.getSelectedValue();
 		rellenarDatos(pokemonSeleccionado);
 		tiposPanel.mlista.removeAllElements();
-		tiposPanel.comboTipo.refrescar(modelo.getArmasLibres());
+		tiposPanel.comboTipo.refrescar(modelo.getTipoLibres());
+		tiposPanel.mlista.addElement(pokemonSeleccionado.getTipos());
+		tiposPanel.comboTipo.setEnabled(false);
+		
 	}
 }

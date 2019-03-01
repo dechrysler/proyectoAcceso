@@ -49,7 +49,7 @@ public class PanelAnadirTipos extends JPanel implements ActionListener{
 	}
 	private void inicializar() {
 		Modelo modelo = new Modelo();
-		List<Tipo>tipos = modelo.getArmasLibres();
+		List<Tipo>tipos = modelo.getTipoLibres();
 		anadir.addActionListener(this);
 		eliminar.addActionListener(this);
 		refrescar();
@@ -67,7 +67,7 @@ public class PanelAnadirTipos extends JPanel implements ActionListener{
 	public void refrescar() {
 		Modelo modelo= new Modelo();
 		mlista.removeAllElements();
-		comboTipo.refrescar(modelo.getArmasLibres());
+		comboTipo.refrescar(modelo.getTipo());
 	}
 	public void limpiar() {
 		mlista.removeAllElements();
@@ -80,15 +80,14 @@ public class PanelAnadirTipos extends JPanel implements ActionListener{
 				 return;
 			 mlista.addElement(tipoSelect);
 			 comboTipo.removeItem(tipoSelect);
+			 comboTipo.setEnabled(false);
 			 }
 			 else if(event.getSource().equals(eliminar)) {
 				 if(list.getSelectedIndex()==-1)
 					 return ;
-				 Modelo modelo = new Modelo();
-				 Tipo tipo =(Tipo) list.getSelectedValue();
-				 tipo.setPokemon(null);
-				 modelo.modificar(tipo);
 				 comboTipo.addItem((Tipo)mlista.remove(list.getSelectedIndex()));
+				 mlista.clear();
+				 comboTipo.setEnabled(true);
 			 }
 		}
 	

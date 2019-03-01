@@ -31,12 +31,27 @@ public class Modelo {
 		Session sesion = HibernateUtil.getCurrentSession();
 		sesion.beginTransaction();
 		sesion.save(pokemon);
-		System.out.println(pokemon.getTipos().toString());
-		for (Tipo tipos: pokemon.getTipos())
-				sesion.save(tipos);
 		sesion.getTransaction().commit();
 		sesion.close();
 	}
+	
+	public void modificar(Pokemon pokemon) {
+		Session sesion = HibernateUtil.getCurrentSession();
+		sesion.beginTransaction();
+		sesion.update(pokemon);
+		sesion.getTransaction().commit();
+		sesion.close();
+	}
+	
+	public Pokemon eliminar(Pokemon pokemon){
+        Session session = HibernateUtil.getCurrentSession();
+        session.beginTransaction();
+        session.delete(pokemon);
+        session.getTransaction().commit();
+        session.close();
+
+        return pokemon;
+    }
 	/**
 	 * Guarda armas que se pasa como parametro
 	 * @param tipo
@@ -45,39 +60,28 @@ public class Modelo {
 		Session sesion = HibernateUtil.getCurrentSession();
 		sesion.beginTransaction();
 		sesion.save(tipo);
+		for(Pokemon poke : tipo.getPokemones()) {
+			poke.setTipo(tipo);
+		sesion.save(tipo);
+		}
 		sesion.getTransaction().commit();
 		sesion.close();
 		
 	}
-	public void modificar(Pokemon pokemon) {
-		Session sesion = HibernateUtil.getCurrentSession();
-		sesion.beginTransaction();
-		sesion.update(pokemon);
-		for(Tipo tipin: pokemon.getTipos())
-			tipin.setPokemon(pokemon);
-		sesion.getTransaction().commit();
-		sesion.close();
-	}
+	
 	public void modificar(Tipo tipo) {
 		 Session session = HibernateUtil.getCurrentSession();
 	        session.beginTransaction();
+	        tipo.getPokemones().clear();
 	        session.save(tipo);
+	    	for(Pokemon poke : tipo.getPokemones()) {
+				poke.setTipo(tipo);
+				session.save(tipo);
+			}
 	        session.getTransaction().commit();
 	        session.close();
 	}
-	public Pokemon eliminar(Pokemon pokemon){
-        Session session = HibernateUtil.getCurrentSession();
-        session.beginTransaction();
-        session.delete(pokemon);
-        for(Tipo tipo : pokemon.getTipos()){
-            tipo.setPokemon(pokemon);
-            session.update(tipo);
-        }
-        session.getTransaction().commit();
-        session.close();
-
-        return pokemon;
-    }
+	
 	 public void eliminar(Tipo tipo){
 	        Session session = HibernateUtil.getCurrentSession();
 	        session.beginTransaction();
@@ -89,8 +93,8 @@ public class Modelo {
 	 public void borrarTodo(){
 	        Session session = HibernateUtil.getCurrentSession();
 	        session.beginTransaction();
-	        session.createSQLQuery("truncate table Tipo").executeUpdate();
-	        session.createSQLQuery("truncate table Pokemon").executeUpdate();
+	        session.createSQLQuery("truncate table tipo").executeUpdate();
+	        session.createSQLQuery("truncate table pokemon").executeUpdate();
 	        session.getTransaction().commit();
 	        session.close();
 	    }
@@ -105,11 +109,11 @@ public class Modelo {
         session.close();
         return tipos;
     }
-	 public List<Tipo> getArmasLibres(){
+	 public List<Tipo> getTipoLibres(){
 	        Session session = HibernateUtil.getCurrentSession();
-	        ArrayList<Tipo> armas = (ArrayList<Tipo>) session.createQuery("FROM Tipo a WHERE a.pokemon IS NULL").list();
+	        ArrayList<Tipo> tipos = (ArrayList<Tipo>) session.createQuery("FROM Pokemon a WHERE a.tipo IS NULL").list();
 	        session.close();
-	        return armas;
+	        return tipos;
 	    }
 
 }
