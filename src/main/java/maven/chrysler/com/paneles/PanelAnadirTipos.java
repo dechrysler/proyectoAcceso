@@ -49,7 +49,6 @@ public class PanelAnadirTipos extends JPanel implements ActionListener{
 	}
 	private void inicializar() {
 		Modelo modelo = new Modelo();
-		List<Tipo>tipos = modelo.getTipoLibres();
 		anadir.addActionListener(this);
 		eliminar.addActionListener(this);
 		refrescar();
@@ -63,7 +62,9 @@ public class PanelAnadirTipos extends JPanel implements ActionListener{
 	public List<Tipo> getListaTipos(){
 		return(List<Tipo>) Collections.list(mlista.elements());
 	}
-	
+	public void pokemonesLibres() {
+		
+	}
 	public void refrescar() {
 		Modelo modelo= new Modelo();
 		mlista.removeAllElements();

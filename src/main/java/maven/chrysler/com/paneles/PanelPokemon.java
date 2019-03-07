@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.sound.midi.Soundbank;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -14,25 +14,30 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import maven.chrysler.com.Proyecto1.Pokemon;
 import maven.chrysler.com.Proyecto1.Tipo;
 import necesarios.Modelo;
 
-public class PanelPokemon extends JPanel implements ActionListener,ListSelectionListener {
+public class PanelPokemon extends JPanel implements ActionListener,ListSelectionListener,DocumentListener{
 	private JTextField tfNombre;
 	private JTextField tfVida;
 	private JTextField tfDanio;
-	private JTextField textField_4;
+	private JTextField tfBusqueda;
 	private BotonesCrud botones;
 	public Modelo modelo;
-	private JList list,listaPokemon;
+	private JList listaBusqueda,listaPokemon;
 	private DefaultListModel <Pokemon>mlist;
 	private Pokemon pokemonSeleccionado;
 	private boolean editar=false;
 	private PanelAnadirTipos tiposPanel;
-	private JButton btnNewButton;
+	private JButton btnNewButton,btnRecuperar;
+	private DefaultListModel <Pokemon> mlistaBusqueda;
+	public int count = 0;
 	public PanelPokemon(Modelo modelo) {
 		setLayout(null);
 		this.modelo = modelo;
@@ -81,11 +86,11 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		mlist = new DefaultListModel<>();
 		listaPokemon.setModel(mlist);
 		listaPokemon.addListSelectionListener(this);
-		textField_4 = new JTextField();
+		tfBusqueda = new JTextField();
 		
-		textField_4.setBounds(339, 182, 111, 20);
-		add(textField_4);
-		textField_4.setColumns(10);
+		tfBusqueda.setBounds(339, 182, 111, 20);
+		add(tfBusqueda);
+		tfBusqueda.setColumns(10);
 		
 		JLabel lblBuscar = new JLabel("Buscar");
 		lblBuscar.setBounds(288, 185, 46, 14);
@@ -95,8 +100,10 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		scrollPane_1.setBounds(280, 213, 170, 76);
 		add(scrollPane_1);
 		
-		 list = new JList();
-		scrollPane_1.setViewportView(list);
+		listaBusqueda = new JList();
+		scrollPane_1.setViewportView(listaBusqueda);
+		mlistaBusqueda = new DefaultListModel<>();
+		listaBusqueda.setModel(mlistaBusqueda);
 		botones = new BotonesCrud();
 		botones.btnEditar.setLocation(99, 0);
 		botones.btnGuardar.setLocation(99, 22);
@@ -105,53 +112,88 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		botones.setToolTipText("LUL\r\n");
 		botones.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		botones.setBackground(Color.BLUE);
-		botones.setBounds(47, 198, 190, 67);
+		botones.setBounds(36, 204, 190, 67);
 		add(botones);
 		
 		 btnNewButton = new JButton("ELIMINAR TODO");
 		 btnNewButton.setActionCommand("ELIMINAR_TODO");
 		 btnNewButton.addActionListener(this);
-		btnNewButton.setBounds(100, 266, 164, 23);
+		btnNewButton.setBounds(138, 295, 164, 20);
 		add(btnNewButton);
-		 inicializar();
 		 tiposPanel = new PanelAnadirTipos();
-		 tiposPanel.setBounds(172,52, 106, 135);
+		 tiposPanel.setBounds(172,52, 117, 135);
 		 add(tiposPanel);
+		 
+		  btnRecuperar = new JButton("Recuperar");
+		  btnRecuperar.setActionCommand("RECUPERAR");
+		 btnRecuperar.setBounds(0, 295, 122, 20);
+		 add(btnRecuperar);
+		 inicializar();
 	}
 	public void inicializar() {
 		botones.addListeners(this);
 		actualizarPersonajes();
+		tfBusqueda.getDocument().addDocumentListener(this);
+		 listaBusqueda.addListSelectionListener(this);
+		 btnRecuperar.addActionListener(this);
+		 btnRecuperar.setEnabled(false);
+		 botones.modoEdicion(false);
 	}
 	public void actionPerformed(ActionEvent e) {
 	
 		switch(e.getActionCommand()) {
 			case "ELIMINAR":
-				modelo.eliminar(pokemonSeleccionado);
+				pokemonSeleccionado=modelo.eliminar(pokemonSeleccionado);
 				actualizarPersonajes();
 				limpiar();
+				count=0;
+				btnRecuperar.setEnabled(true);
+				botones.modoEdicion(false); 
 				break;
 			case "GUARDAR":
 				if(!editar)
 					modelo.guardar(recogerDatos());
 				else
-					modelo.modificar(pokemonSeleccionado);
+					modelo.modificar(recogerDatos());
 				editar = false;
 				limpiar();
 				actualizarPersonajes();
+				count=0;
+				btnRecuperar.setEnabled(false);
+				 botones.modoEdicion(false);
 				break;
 			case "EDITAR":
 				editar=true;
+				 botones.modoEdicion(true);
 				break;
 			case "NUEVO":
 				limpiar();
 				tfNombre.grabFocus();
+				btnRecuperar.setEnabled(false);
+				 botones.modoEdicion(true);
 				break;
 			case "CANCELAR":
 				limpiar();
+				count=0;
+				btnRecuperar.setEnabled(false);
+				 botones.modoEdicion(false);
+				 tiposPanel.comboTipo.setEditable(true);
 				break;
 			case "ELIMINAR_TODO":
 				modelo.borrarTodo();
 				actualizarPersonajes();
+				count=0;
+				btnRecuperar.setEnabled(false);
+				 botones.modoEdicion(false);
+				break;
+				
+			case "RECUPERAR":
+				rellenarDatos(pokemonSeleccionado);
+				tiposPanel.mlista.removeAllElements();
+				tiposPanel.comboTipo.refrescar(modelo.getTipoLibres(pokemonSeleccionado));
+				tiposPanel.mlista.addElement(pokemonSeleccionado.getTipos());
+				btnRecuperar.setEnabled(false);
+				botones.setEnabled(true);
 				break;
 			default:
 				System.out.println("error");
@@ -171,14 +213,10 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 			pokemon.setNombre(nombre);
 			pokemon.setVida(vida);
 			pokemon.setDaño(danio);
-	        if(editar) {
+	        if(editar==true) {
 	            pokemon.setId(pokemonSeleccionado.getId());
-	            if(pokemon.getTipos()!=null)
-	            	if(tiposPanel.mlista.size()==0)
-	            		pokemon.setTipo(null);
-	            	else
-	            		if(pokemon.getTipos().getId()==tiposPanel.getListaTipos().get(0).getId())
-	            			pokemon.setTipo(tiposPanel.getListaTipos().get(0));
+	            for(Tipo poke: tiposPanel.getListaTipos())
+	            	pokemon.setTipo(poke);
 	        }
 	       if(tiposPanel.mlista.size()==1)
 	    	   pokemon.setTipo(tiposPanel.getListaTipos().get(0));
@@ -198,17 +236,57 @@ public class PanelPokemon extends JPanel implements ActionListener,ListSelection
 		tfVida.setText("");
 		tfDanio.setText("");
 		tiposPanel.refrescar();
+		tiposPanel.comboTipo.setEnabled(true);
 	}
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
+		
+		if(count==0) {
 		if(listaPokemon.getSelectedIndex()==-1)
 			return;
 		pokemonSeleccionado =(Pokemon) listaPokemon.getSelectedValue();
 		rellenarDatos(pokemonSeleccionado);
 		tiposPanel.mlista.removeAllElements();
-		tiposPanel.comboTipo.refrescar(modelo.getTipoLibres());
+		tiposPanel.comboTipo.refrescar(modelo.getTipoLibres(pokemonSeleccionado));
 		tiposPanel.mlista.addElement(pokemonSeleccionado.getTipos());
-		tiposPanel.comboTipo.setEnabled(false);
+		count++;
+		}
+		else
+			count=0;
+	}
+	@Override
+	public void changedUpdate(DocumentEvent event) {
+		
 		
 	}
-}
+	@Override
+	public void insertUpdate(DocumentEvent e) {
+		mlistaBusqueda.removeAllElements();
+		for(int i=0;i<mlist.size();i++) 
+		{
+			if(mlist.getElementAt(i).getNombre().startsWith(tfBusqueda.getText()) 
+					&& mlist.getElementAt(i).getNombre().length()>=tfBusqueda.getText().length()) {
+				mlistaBusqueda.addElement(mlist.getElementAt(i));
+			}
+		}
+		
+	}
+	@Override
+	public void removeUpdate(DocumentEvent arg0) {
+		if(!tfBusqueda.getText().equals(""))
+		{
+			mlistaBusqueda.removeAllElements();
+		for(int i=0;i<mlist.size();i++) 
+		{
+			if(mlist.getElementAt(i).getNombre().startsWith(tfBusqueda.getText()) 
+					&& mlist.getElementAt(i).getNombre().length()>=tfBusqueda.getText().length()) {
+				mlistaBusqueda.addElement(mlist.getElementAt(i));
+			}
+		}
+
+		}
+		else
+			mlistaBusqueda.removeAllElements();
+	}
+	}
+

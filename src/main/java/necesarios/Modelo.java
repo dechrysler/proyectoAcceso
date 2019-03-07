@@ -1,12 +1,15 @@
 package necesarios;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import maven.chrysler.com.Proyecto1.HibernateUtil;
 import maven.chrysler.com.Proyecto1.Pokemon;
 import maven.chrysler.com.Proyecto1.Tipo;
+import maven.chrysler.com.Proyecto1.Usuario;
 
 public class Modelo {
 	public Modelo() {
@@ -38,6 +41,7 @@ public class Modelo {
 	public void modificar(Pokemon pokemon) {
 		Session sesion = HibernateUtil.getCurrentSession();
 		sesion.beginTransaction();
+		System.out.println(pokemon.getTipos());
 		sesion.update(pokemon);
 		sesion.getTransaction().commit();
 		sesion.close();
@@ -85,6 +89,11 @@ public class Modelo {
 	 public void eliminar(Tipo tipo){
 	        Session session = HibernateUtil.getCurrentSession();
 	        session.beginTransaction();
+	        for(Pokemon poke: tipo.getPokemones()) {
+	        	poke.setTipo(null);
+	        	session.update(poke);
+	        }
+	        	
 	        session.delete(tipo);
 	        session.getTransaction().commit();
 	        session.close();
@@ -109,11 +118,21 @@ public class Modelo {
         session.close();
         return tipos;
     }
-	 public List<Tipo> getTipoLibres(){
-	        Session session = HibernateUtil.getCurrentSession();
-	        ArrayList<Tipo> tipos = (ArrayList<Tipo>) session.createQuery("FROM Pokemon a WHERE a.tipo IS NULL").list();
+	 public List<Tipo> getTipoLibres(Pokemon pokemon){
+		 Session session = HibernateUtil.getCurrentSession();
+	        ArrayList<Tipo> tipos =(ArrayList<Tipo>) session.createQuery("FROM Tipo").list();
 	        session.close();
+	        tipos.remove((Tipo)pokemon.getTipos());
 	        return tipos;
 	    }
+	 public boolean iniciarSesion(String usuario, String contrasena) throws SQLException {
+			Session sesion = HibernateUtil.getCurrentSession();
+			Query query = sesion.createQuery("FROM Usuario u WHERE u.usuario = :usuario AND u.contrasena = SHA1(:contrasena)");
+					query.setParameter("usuario", usuario);
+					query.setParameter("contrasena", contrasena);
+					Usuario cliente = (Usuario) query.uniqueResult();
+					return (cliente != null);
+		}
+
 
 }

@@ -89,6 +89,7 @@ public class PanelTipo extends JPanel implements ActionListener,ListSelectionLis
 	public void inicializar() {
 		botones.addListeners(this);
 		refrescarLista();
+		botones.modoEdicion(false);
 	}
 	public void actionPerformed(ActionEvent e) {
 	
@@ -97,6 +98,7 @@ public class PanelTipo extends JPanel implements ActionListener,ListSelectionLis
 				modelo.eliminar(tipoSeleccionado); 
 				limpiar();
 				refrescarLista();
+				botones.modoEdicion(false);
 				break;
 			case "GUARDAR":
 				String nombre =tfNombre.getText();
@@ -109,23 +111,28 @@ public class PanelTipo extends JPanel implements ActionListener,ListSelectionLis
 				modelo.guardar(tipo);
 				limpiar();
 				refrescarLista();
+				botones.modoEdicion(false);
 				break;
 			case "EDITAR":
 				modelo.modificar(tipoSeleccionado);	
 				limpiar();
 				refrescarLista();
+				botones.modoEdicion(true);
 				break;
 			case "NUEVO":
 				limpiar();
 				tfNombre.grabFocus();
+				botones.modoEdicion(true);
 				break;
 			case "CANCELAR":
 				limpiar();
+				botones.modoEdicion(false);
 				break;
+				
 		}
 		
 	}
-	private void refrescarLista() {
+	public void refrescarLista() {
 		mlistTipos.removeAllElements();
 		for(Tipo tipo : modelo.getTipo())
 			mlistTipos.addElement(tipo);

@@ -16,8 +16,8 @@ import javax.swing.SwingConstants;
 public class Vista extends JFrame {
 
 	public JPanel contenedor;
-	public JMenu mnNewMenu,mnNewMenu_1,mnNewMenu_2;
-	public JMenuItem mntmNewMenuItem,mntmPokemon,mntmTipo;
+	public JMenu mnNewMenu,mnNewMenu_1;
+	public JMenuItem salir,mntmPokemon,mntmTipo;
 	public JTabbedPane tabbedPane;
 	public Vista() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -29,8 +29,9 @@ public class Vista extends JFrame {
 		mnNewMenu = new JMenu("Archivo");
 		menuBar.add(mnNewMenu);
 		
-	    mntmNewMenuItem = new JMenuItem("Salir");
-		mnNewMenu.add(mntmNewMenuItem);
+	    salir = new JMenuItem("Salir");
+	    salir.setActionCommand("SALIR");
+		mnNewMenu.add(salir);
 		
 		mnNewMenu_1 = new JMenu("Editar");
 		menuBar.add(mnNewMenu_1);
@@ -45,16 +46,13 @@ public class Vista extends JFrame {
 		mntmTipo.setHorizontalAlignment(SwingConstants.CENTER);
 		mnNewMenu_1.add(mntmTipo);
 		mntmTipo.setActionCommand("panel_tipo");
-		
-		mnNewMenu_2 = new JMenu("New menu");
-		menuBar.add(mnNewMenu_2);
 		contenedor = new JPanel();
 		contenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contenedor);
 		contenedor.setLayout(null);
 		
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setBounds(0, 0, 543, 353);
+		tabbedPane.setBounds(0, 0, 497, 353);
 		contenedor.add(tabbedPane);
 		this.setVisible(true);
 		this.setLocationRelativeTo(null);

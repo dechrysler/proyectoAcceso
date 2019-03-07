@@ -18,6 +18,7 @@ public class HibernateUtil {
 	// Se registran las clases que hay que mapear con cada tabla de la base de datos
 	configuration.addAnnotatedClass(Pokemon.class);
 	configuration.addAnnotatedClass(Tipo.class);
+	configuration.addAnnotatedClass(Usuario.class);
 	
 	ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(
 	 configuration.getProperties()).build();
